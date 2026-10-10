@@ -57,13 +57,17 @@ def generate_response(messages, intent, entities):
     )
 
     context = (
-        f"Current intent: {intent}\n"
-        f"Known assignment details: {entities}\n\n"
-        f"Retrieved academic guidance:\n{retrieved_context}\n\n"
+
         "Use the retrieved guidance when it is relevant. "
         "Treat it as general academic advice, not official school policy. "
         "Do not invent facts, deadlines, or sources. "
-        "If information is missing, ask the student for clarification."
+        "If information is missing, ask the student for clarification. "
+        "Never invent or assume assignment deadlines, dates, or times. "
+        "If a student provides only a weekday, do not assume a time. "
+        "If a due date or time is missing, ask the student to provide it. "
+        "Never present an example deadline as the student's actual deadline. "
+        "You may suggest estimated task durations, but label them as estimates. "
+        "Use only the assignment details the student actually provided."
     )
 
 
