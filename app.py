@@ -61,25 +61,54 @@ if prompt := st.chat_input("What can I help you with today?"):
         st.markdown(prompt)
 
 
-    # Identify the student's request.
+
+    # Classify each new request independently.
     detected_intent = classify_intent(prompt)
+    st.session_state.current_intent = detected_intent
 
-    if detected_intent != "unknown":
-        st.session_state.current_intent = detected_intent
-
-    # Collect new details without forgetting earlier ones.
+    # Preserve collected academic details.
     st.session_state.entities = update_entities(
         st.session_state.entities,
         prompt
     )
 
-    # Generate a response using the student's intent and saved details.
-    with st.spinner("Thinking..."):
-        response = generate_response(
-            st.session_state.messages,
-            st.session_state.current_intent,
-            st.session_state.entities
+    # Official policies and grade appeals require human guidance.
+    question = prompt.lower()
+
+    needs_human = (
+        "appeal" in question
+        or "change my grade" in question
+        or (
+            "policy" in question
+            and any(
+                term in question
+                for term in (
+                    "official", "school", "college",
+                    "course", "grade"
+                )
+            )
         )
+    )
+
+    if needs_human:
+        response = (
+            "I can help you understand the situation, but I "
+            "cannot change grades or verify your college's "
+            "official policies. Please contact your instructor "
+            "or academic advisor and consult your college's "
+            "official grade-appeal procedures for accurate "
+            "requirements and deadlines. If you provide the "
+            "policy text, I can help explain it or help you "
+            "draft a respectful message."
+        )
+    else:
+        with st.spinner("Thinking..."):
+            response = generate_response(
+                st.session_state.messages,
+                st.session_state.current_intent,
+                st.session_state.entities
+            )
+
 
     with st.chat_message("assistant"):
         st.markdown(response)
